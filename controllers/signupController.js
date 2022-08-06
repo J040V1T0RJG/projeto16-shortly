@@ -13,7 +13,10 @@ const createSignup = async (req, res) => {
     };
 
     try {
-        const result = await connection.query("SELECT * FROM users WHERE email = $1", [newUser.email]);
+        const result = await connection.query(`
+            SELECT * FROM users WHERE email = $1`,
+            [newUser.email]
+        );
 
         if (result.rowCount > 0) {
             return res.sendStatus(409);
