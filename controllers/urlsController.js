@@ -89,4 +89,42 @@ const getUrlsOpenShortUrl = async (req, res) => {
     };
 };
 
-export { shortenUrl, getUrls, getUrlsOpenShortUrl };
+const deleteUrls = async (req, res) => {
+    const id = req.params.id
+    const authorization = Trim(req.headers.authorization?.replace("Bearer", ""));
+
+    try {
+        const validateTokenAuthorization = await connection.query(`
+            SELECT * FROM sessions  WHERE token = $1`,
+            [authorization]
+        );
+
+        jwt.verify(authorization, process.env.SECRET, async function (err, decoded){
+            if (validateTokenAuthorization.rowCount < 1 || !authorization || err) {
+                return res.sendStatus(401);
+            };
+        });
+
+        const checkExistingUrl = await connection.query(`
+            SELECT * FROM urls WHERE id = $1 AND "userId" = $2`,
+            [id, validateTokenAuthorization.rows[0].userId]
+        );
+
+        if (checkExistingUrl.rowCount < 1) {
+            return res.sendStatus(401);
+        };
+
+        //Caso a url encurtada não exista, responder com status code 404.
+        
+        await connection.query(`
+            DELETE FROM urls WHERE id = $1`,
+            [id]
+        );
+
+        res.sendStatus(204)
+    } catch (error) {
+        res.status(500).send(error);
+    };
+};
+
+export { shortenUrl, getUrls, getUrlsOpenShortUrl, deleteUrls };
