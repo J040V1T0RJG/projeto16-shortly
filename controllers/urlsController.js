@@ -115,7 +115,7 @@ const deleteUrls = async (req, res) => {
         };
 
         //Caso a url encurtada não exista, responder com status code 404.
-        
+
         await connection.query(`
             DELETE FROM urls WHERE id = $1`,
             [id]

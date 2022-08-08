@@ -11,5 +11,5 @@ const connection = new Pool({
         rejectUnauthorized: false
     }
 });
-// console.log("connection: ", connection);
+
 export default connection;

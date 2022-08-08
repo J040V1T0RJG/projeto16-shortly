@@ -26,22 +26,25 @@ const getUser = async (req, res) => {
             return res.sendStatus(404)
         };
 
-        const array = await connection.query(`
+        const { rows: userDataArray } = await connection.query(`
             SELECT 
                 users.id, 
                 users.name,
+                SUM(urls.visits) AS "visitCount",
                 array_to_json(array_agg(urls)) AS "shortenedUrls"
             FROM users
             JOIN urls
                 ON urls."userId" = users.id
-            GROUP BY users.id
-            `
+            WHERE users.id = $1
+            GROUP BY users.id`,
+            [checkExistingUser.rows[0].id]
         );
 
-        res.status(200).send(array.rows[0]);
+        res.status(200).send(userDataArray);
     } catch (error) {
         res.status(500).send(error);
     };
 };
+
 
 export { getUser };
