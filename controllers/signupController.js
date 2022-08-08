@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 
 const createSignup = async (req, res) => {
     const newUser = req.body;
-    const { error: errorSignupSchema } = signupSchema.validate(newUser, { abortEarly: false});
+    const { error: errorSignupSchema } = signupSchema.validate(newUser, { abortEarly: false });
     const encryptedPassword = bcrypt.hashSync(newUser.password, 10);
     const differentPasswords = (newUser.password !== newUser.confirmPassword);
 

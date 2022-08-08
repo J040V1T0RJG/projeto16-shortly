@@ -1,23 +1,22 @@
 import connection from "../dbStrategy/postgres.js";
-import bcrypt from "bcrypt";
 import signinSchema from "../schemas/signinSchema.js";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 import dayjs from "dayjs";
+
 
 dotenv.config();
 
 const signin = async (req, res) => {
     const user = req.body;
-    const { error: errorSigninSchema } = signinSchema.validate(user, { abortEarly: false});
+    const { error: errorSigninSchema } = signinSchema.validate(user, { abortEarly: false });
 
     if (errorSigninSchema) {
         return res.status(422).send(errorSigninSchema.details);
     };
 
     try {
-
-//checkExistingUser
         const checkExistingUser = await connection.query(`
             SELECT * FROM users WHERE email = $1`, 
             [user.email]
