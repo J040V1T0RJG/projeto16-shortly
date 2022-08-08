@@ -63,4 +63,30 @@ const getUrls = async (req, res) => {
     };
 };
 
-export { shortenUrl, getUrls };
+const getUrlsOpenShortUrl = async (req, res) => {
+    const shortUrl = req.params.shortUrl;
+
+    try {
+        const checkExistingShortUrl = await connection.query(`
+            SELECT * FROM urls WHERE "shortUrl" = $1`,
+            [shortUrl]
+        );
+
+        if (checkExistingShortUrl.rowCount < 1) {
+            return res.sendStatus(404);
+        };
+
+        await connection.query(`
+            UPDATE urls 
+            SET visits = $1 
+            WHERE "shortUrl" = $2`,
+            [checkExistingShortUrl.rows[0].visits + 1, shortUrl]
+        );
+
+        res.redirect(302, `https://${shortUrl}`);
+    } catch (error) {
+        res.status(500).send(error);
+    };
+};
+
+export { shortenUrl, getUrls, getUrlsOpenShortUrl };

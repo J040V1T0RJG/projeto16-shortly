@@ -44,7 +44,9 @@ const signin = async (req, res) => {
             const jwtverify =  jwt.verify(validateToken.rows[0].token, process.env.SECRET, async function (err, decoded){
                 if (err) {
                     await connection.query(`
-                        UPDATE sessions SET session = $1, token = $2 WHERE id = $3`,
+                        UPDATE sessions 
+                        SET session = $1, token = $2 
+                        WHERE id = $3`,
                         [now, token, validateToken.rows[0].id]
                     );
                 } else {
